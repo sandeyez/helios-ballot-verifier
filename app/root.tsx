@@ -1,5 +1,5 @@
-import { Links, LiveReload, Meta, Outlet, Scripts } from "@remix-run/react";
-import React from "react";
+import { Links, Meta, Outlet, Scripts } from "@remix-run/react";
+import GlobalSettingsContextProvider from "./contexts/GlobalSettingsContext";
 import "./tailwind.css";
 
 export default function App() {
@@ -11,7 +11,9 @@ export default function App() {
         <Links />
       </head>
       <body className="p-2">
-        <Outlet />
+        <GlobalSettingsContextProvider>
+          <Outlet />
+        </GlobalSettingsContextProvider>
         <Scripts />
       </body>
     </html>

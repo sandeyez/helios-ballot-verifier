@@ -10,7 +10,9 @@ function VisualizeTree({ merkleTree }: VisualizeTreeProps): JSX.Element {
   return (
     <div className="flex flex-col">
       <h1 className="font-bold text-xl">Visualize tree</h1>
-      <VisualizeTreeLayer nodes={[merkleTree]} />
+      <div>
+        <VisualizeTreeLayer nodes={[merkleTree]} />
+      </div>
     </div>
   );
 }

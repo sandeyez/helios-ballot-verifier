@@ -1,4 +1,5 @@
 import { MerkleTreeNode } from "@/types/merkle-tree";
+import { MerkleProof, ProofStep } from "@/types/proofs";
 import SHA256 from "crypto-js/sha256";
 
 export function createMerkleTree(ballots: string[]) {
@@ -61,4 +62,64 @@ export function createMerkleTree(ballots: string[]) {
   }
 
   return nodes[0];
+}
+
+export function getProof(ballot: string, tree: MerkleTreeNode): MerkleProof {
+  // 1. The path to the ballot in the tree will always start at the root.
+  let currentStep = tree;
+
+  let continueSearch = true;
+  let step = 0;
+
+  let included = false;
+
+  // 2. The proof will be a list of siblings that are part of the path to the ballot.
+  let proofSteps: ProofStep[] = [];
+
+  while (continueSearch) {
+    // 3. The next step is the left child if the next digit is 0, otherwise it is the right child.
+    const nextStepIsLeft = ballot[step] === "0";
+
+    const nextStep = nextStepIsLeft ? currentStep.left : currentStep.right;
+
+    if (!nextStep) {
+      throw new Error(
+        "Somehow an undefined step was reached when finding next step"
+      );
+    }
+
+    // 4. If we go left in the tree, the right sibling is part of the proof.
+    const nextProofStep = nextStepIsLeft
+      ? currentStep.right?.value
+      : currentStep.left?.value;
+
+    if (!nextProofStep) {
+      throw new Error("Somehow an undefined proof step was reached");
+    }
+
+    proofSteps.push({
+      sibling: nextProofStep,
+      position: nextStepIsLeft ? "right" : "left",
+    });
+
+    currentStep = nextStep;
+    step++;
+
+    if (nextStep.isLeaf && nextStep.value === ballot) {
+      return {
+        included: true,
+        siblings: proofSteps.reverse(),
+      };
+    }
+
+    if (nextStep.value === "0") {
+      return {
+        included: false,
+        parentId: currentStep.id,
+        siblings: proofSteps.reverse(),
+      };
+    }
+  }
+
+  throw new Error("Proof could not be found");
 }

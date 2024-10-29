@@ -4,6 +4,7 @@ import { MerkleTreeNode } from "@/types/merkle-tree";
 import { Plus, X } from "lucide-react";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { createMerkleTree } from "../__utils";
+import { useGlobalSettings } from "@/contexts/GlobalSettingsContext";
 
 type AddBallotsFormProps = {
   onGenerateMerkleTree: (tree: MerkleTreeNode) => void;
@@ -15,8 +16,16 @@ function AddBallotsForm({
   onReset,
 }: AddBallotsFormProps): JSX.Element {
   const [ballots, setBallots] = useState<string[]>([]);
-  const [ballotLength, setBallotLength] = useState<number>(2);
+  const { ballotLength, setBallotLength } = useGlobalSettings();
   const [ballotValue, setBallotValue] = useState<string>("");
+
+  const handleReset = () => {
+    setBallots([]);
+    setBallotLength(2);
+    setBallotValue("");
+
+    onReset();
+  };
 
   const handleChangeBallotLength = (e: ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
@@ -29,13 +38,6 @@ function AddBallotsForm({
   };
 
   const handleChangeBallotValue = (e: ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-
-    // Check if any of the digits is different than 0 or 1
-    if (e.target.value.split("").some((c) => c !== "0" && c !== "1")) {
-      return;
-    }
-
     if (e.target.value.length > ballotLength) return;
 
     setBallotValue(e.target.value);
@@ -68,7 +70,12 @@ function AddBallotsForm({
 
   return (
     <div className="flex flex-col gap-2 w-full max-w-80">
-      <h1 className="font-bold text-xl">Enter ballots</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="font-bold text-xl">Enter ballots</h1>
+        <Button variant="destructive" size="sm" onClick={handleReset}>
+          Reset
+        </Button>
+      </div>
       <div className="flex items-center justify-between">
         <span>Ballot length</span>
         <Input
@@ -93,7 +100,11 @@ function AddBallotsForm({
         ))}
       </div>
       <form className="flex gap-2 items-center" onSubmit={handleAddBallot}>
-        <Input value={ballotValue} onChange={handleChangeBallotValue} />
+        <Input
+          value={ballotValue}
+          onChange={handleChangeBallotValue}
+          placeholder="Enter ballot tracker..."
+        />
         <Button type="submit" disabled={ballotValue.length !== ballotLength}>
           <Plus />
         </Button>
