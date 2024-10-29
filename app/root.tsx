@@ -1,12 +1,6 @@
-import { Links, Meta, Outlet, Scripts } from "@remix-run/react";
+import { Links, LiveReload, Meta, Outlet, Scripts } from "@remix-run/react";
 import React from "react";
-
-import type { LinksFunction } from "@remix-run/node";
-import stylesheet from "~/tailwind.css";
-
-export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: stylesheet },
-];
+import "./tailwind.css";
 
 export default function App() {
   return (
@@ -16,9 +10,8 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="p-2">
         <Outlet />
-
         <Scripts />
       </body>
     </html>
