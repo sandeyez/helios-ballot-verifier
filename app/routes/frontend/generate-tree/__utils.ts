@@ -99,7 +99,7 @@ export function getProof(ballot: string, tree: MerkleTreeNode): MerkleProof {
 
     proofSteps.push({
       sibling: nextProofStep,
-      position: nextStepIsLeft ? "right" : "left",
+      siblingPosition: nextStepIsLeft ? "right" : "left",
     });
 
     currentStep = nextStep;
@@ -107,6 +107,7 @@ export function getProof(ballot: string, tree: MerkleTreeNode): MerkleProof {
 
     if (nextStep.isLeaf && nextStep.value === ballot) {
       return {
+        targetId: ballot,
         included: true,
         siblings: proofSteps.reverse(),
       };
@@ -115,7 +116,7 @@ export function getProof(ballot: string, tree: MerkleTreeNode): MerkleProof {
     if (nextStep.value === "0") {
       return {
         included: false,
-        parentId: currentStep.id,
+        targetId: currentStep.id,
         siblings: proofSteps.reverse(),
       };
     }

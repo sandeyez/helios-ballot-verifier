@@ -1,16 +1,10 @@
 export type ProofStep = {
-  position: "left" | "right";
+  siblingPosition: "left" | "right";
   sibling: string;
 };
 
 export type MerkleProof = {
   siblings: ProofStep[];
-} & (
-  | {
-      included: true;
-    }
-  | {
-      included: false;
-      parentId: string;
-    }
-);
+  included: boolean;
+  targetId: string;
+};

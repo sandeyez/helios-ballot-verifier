@@ -1,10 +1,4 @@
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 
 type GlobalSettingsContextValue = {
   setBallotLength: (value: number) => void;
@@ -17,12 +11,16 @@ const GlobalSettingsContext = createContext<GlobalSettingsContextValue>(
 
 export const useGlobalSettings = () => useContext(GlobalSettingsContext);
 
+type GlobalSettingsContextProviderProps = {
+  children: ReactNode;
+  initialBallotLength: number;
+};
+
 function GlobalSettingsContextProvider({
   children,
-}: {
-  children: ReactNode;
-}): JSX.Element {
-  const [ballotLength, setBallotLength] = useState<number>(2);
+  initialBallotLength,
+}: GlobalSettingsContextProviderProps): JSX.Element {
+  const [ballotLength, setBallotLength] = useState<number>(initialBallotLength);
 
   return (
     <GlobalSettingsContext.Provider value={{ ballotLength, setBallotLength }}>

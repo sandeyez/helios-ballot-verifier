@@ -1,5 +1,6 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { Input } from "./ui/input";
+import { useGlobalSettings } from "@/contexts/GlobalSettingsContext";
 
 type BallotTrackerInputProps = {
   value: string;
@@ -10,6 +11,7 @@ function BallotTrackerInput({
   value,
   onChange,
 }: BallotTrackerInputProps): JSX.Element {
+  const { ballotLength } = useGlobalSettings();
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
 
@@ -17,6 +19,8 @@ function BallotTrackerInput({
     if (e.target.value.split("").some((c) => c !== "0" && c !== "1")) {
       return;
     }
+
+    if (e.target.value.length > ballotLength) return;
 
     onChange(e.target.value);
   };

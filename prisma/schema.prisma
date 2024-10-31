@@ -12,3 +12,24 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Node {
+  id       String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  value     String
+  isLeaf    Boolean
+
+  leftId  String?
+  left    Node? @relation("LeftNode", fields: [leftId], references: [id])
+
+  rightId String?
+  right   Node? @relation("RightNode", fields: [rightId], references: [id])
+
+  leftChildOf   Node? @relation("LeftNode")
+  rightChildOf  Node? @relation("RightNode")
+
+  @@unique(id)
+  @@unique(leftId)
+  @@unique(rightId)
+}

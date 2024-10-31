@@ -22,19 +22,34 @@ function ProofVerifier({
     if (!proof || !root || !target) return;
 
     if (proof.included === false) {
-      if (!target.startsWith(proof.parentId)) {
+      if (!target.startsWith(proof.targetId)) {
+        setIsValid(false);
+        return;
+      }
+    } else {
+      if (proof.targetId !== target) {
         setIsValid(false);
         return;
       }
     }
 
+    const path = proof.siblings
+      .map((s) => (s.siblingPosition === "left" ? "1" : "0"))
+      .reverse()
+      .join("");
+
+    if (path !== proof.targetId) {
+      setIsValid(false);
+      return;
+    }
+
     let currentHash = proof.included ? target : "0";
 
     for (const step of proof.siblings) {
-      const left = step.position === "left" ? step.sibling : currentHash;
-      const right = step.position === "right" ? step.sibling : currentHash;
+      const left = step.siblingPosition === "left" ? step.sibling : currentHash;
+      const right =
+        step.siblingPosition === "right" ? step.sibling : currentHash;
 
-      console.log(currentHash);
       currentHash = SHA256(left + right).toString();
     }
     console.log(currentHash);

@@ -5,6 +5,7 @@ import { Plus, X } from "lucide-react";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { createMerkleTree } from "../__utils";
 import { useGlobalSettings } from "@/contexts/GlobalSettingsContext";
+import BallotTrackerInput from "@/components/BallotTrackerInput";
 
 type AddBallotsFormProps = {
   onGenerateMerkleTree: (tree: MerkleTreeNode) => void;
@@ -35,12 +36,6 @@ function AddBallotsForm({
     setBallotLength(value);
     setBallots([]);
     onReset();
-  };
-
-  const handleChangeBallotValue = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.length > ballotLength) return;
-
-    setBallotValue(e.target.value);
   };
 
   const handleAddBallot = (e: FormEvent) => {
@@ -100,11 +95,7 @@ function AddBallotsForm({
         ))}
       </div>
       <form className="flex gap-2 items-center" onSubmit={handleAddBallot}>
-        <Input
-          value={ballotValue}
-          onChange={handleChangeBallotValue}
-          placeholder="Enter ballot tracker..."
-        />
+        <BallotTrackerInput value={ballotValue} onChange={setBallotValue} />
         <Button type="submit" disabled={ballotValue.length !== ballotLength}>
           <Plus />
         </Button>
