@@ -1,22 +1,15 @@
 import { vitePlugin as remix } from "@remix-run/dev";
 import { defineConfig } from "vite";
+import { createRoutesFromFolders } from "@remix-run/v1-route-convention";
 
 export default defineConfig({
   plugins: [
     remix({
+      appDirectory: "app",
+      buildDirectory: "build",
+      ssr: true,
       routes(defineRoutes) {
-        return defineRoutes((route) => {
-          route("/simulate", "routes/frontend/simulate/index.tsx");
-          route("/", "routes/frontend/home/index.tsx");
-          route("generate-tree", "routes/frontend/generate-tree/index.tsx");
-          route("/api/add-random-ballots", "routes/api/add-random-ballots.ts");
-          route(
-            "/api/generate-merkle-tree",
-            "routes/api/generate-merkle-tree.ts"
-          );
-          route("/api/delete-all-ballots", "routes/api/delete-all-ballots.ts");
-          route("/api/generate-proof", "routes/api/generate-proof.ts");
-        });
+        return createRoutesFromFolders(defineRoutes);
       },
     }),
   ],
@@ -30,5 +23,24 @@ export default defineConfig({
     alias: {
       "@": "/app",
     },
+  },
+  optimizeDeps: {
+    include: [
+      "@radix-ui/react-icons",
+      "@radix-ui/react-navigation-menu",
+      "class-variance-authority",
+      "clsx",
+      "tailwind-merge",
+      "@radix-ui/react-toast",
+      "lucide-react",
+      "@radix-ui/react-slot",
+      "@prisma/client",
+      "@radix-ui/react-label",
+      "@radix-ui/react-separator",
+      "@radix-ui/react-accordion",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-scroll-area",
+      "@radix-ui/react-slider",
+    ],
   },
 });

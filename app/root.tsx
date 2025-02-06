@@ -1,10 +1,12 @@
 import {
+  Link,
   Links,
   Meta,
   Outlet,
   Scripts,
   useLoaderData,
   useLocation,
+  useMatches,
 } from "@remix-run/react";
 import {
   NavigationMenu,
@@ -15,6 +17,8 @@ import {
 } from "./components/ui/navigation-menu";
 import GlobalSettingsContextProvider from "./contexts/GlobalSettingsContext";
 import "./tailwind.css";
+import { ErrorPage } from "./components/ErrorPage";
+import { Toaster } from "./components/ui/toaster";
 
 type LoaderData = {
   ballotLength: number;
@@ -41,12 +45,12 @@ export default function App() {
     href: string;
   }[] = [
     {
-      label: "Local playground",
-      href: "/generate-tree",
+      label: "Merkle Tree",
+      href: "/merkle-tree",
     },
     {
-      label: "Simulate real-world behaviour",
-      href: "/simulate",
+      label: "Radix Tree",
+      href: "/radix-tree",
     },
   ];
 
@@ -57,9 +61,12 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="p-2">
+      <body className="gap-4 max-w-[100dvw] h-screen w-screen max-h-svh overflow-auto flex flex-col">
         <GlobalSettingsContextProvider initialBallotLength={ballotLength}>
-          <div className="w-screen flex items-center justify-center">
+          <nav className="flex items-center py-2 px-8">
+            <Link className="text-lg font-bold mr-8" to={"/"}>
+              Helios Ballot Verifier
+            </Link>
             <NavigationMenu>
               <NavigationMenuList>
                 {navigationItems.map(({ href, label }) => (
@@ -75,10 +82,11 @@ export default function App() {
                 ))}
               </NavigationMenuList>
             </NavigationMenu>
-          </div>
-          <div className="p-4">
+          </nav>
+          <div className="w-full h-full flex-grow">
             <Outlet />
           </div>
+          <Toaster />
         </GlobalSettingsContextProvider>
         <Scripts />
       </body>

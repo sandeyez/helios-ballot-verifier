@@ -13,23 +13,60 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Node {
+model MerkleNode {
   id       String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
   value     String
-  isLeaf    Boolean
+
+  leftBallotId  String? @unique
+  leftBallot    Ballot? @relation("LeftBallot", fields: [leftBallotId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  rightBallotId String? @unique
+  rightBallot   Ballot? @relation("RightBallot", fields: [rightBallotId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   leftId  String?
-  left    Node? @relation("LeftNode", fields: [leftId], references: [id])
+  left    MerkleNode? @relation("LeftNode", fields: [leftId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   rightId String?
-  right   Node? @relation("RightNode", fields: [rightId], references: [id])
+  right   MerkleNode? @relation("RightNode", fields: [rightId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  leftChildOf   Node? @relation("LeftNode")
-  rightChildOf  Node? @relation("RightNode")
+  leftChildOf   MerkleNode? @relation("LeftNode")
+  rightChildOf  MerkleNode? @relation("RightNode")
 
   @@unique(id)
   @@unique(leftId)
   @@unique(rightId)
+}
+
+model RadixNode {
+  id       String   @id @default(uuid())
+  value     String
+
+  leftBallotId  String? @unique
+  leftBallot    Ballot? @relation("LeftBallot", fields: [leftBallotId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  rightBallotId String? @unique
+  rightBallot   Ballot? @relation("RightBallot", fields: [rightBallotId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  leftId  String?
+  left    RadixNode? @relation("LeftNode", fields: [leftId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  rightId String?
+  right   RadixNode? @relation("RightNode", fields: [rightId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  leftChildOf   RadixNode? @relation("LeftNode")
+  rightChildOf  RadixNode? @relation("RightNode")
+
+  @@unique(id)
+  @@unique(leftId)
+  @@unique(rightId)
+}
+
+model Ballot {
+  id      String   @id @default(uuid())
+
+  leftChildOfMerkleParent  MerkleNode? @relation("LeftBallot")
+  rightChildOfMerkleParent MerkleNode? @relation("RightBallot")
+
+  leftChildOfRadixParent  RadixNode? @relation("LeftBallot")
+  rightChildOfRadixParent RadixNode? @relation("RightBallot")
 }
