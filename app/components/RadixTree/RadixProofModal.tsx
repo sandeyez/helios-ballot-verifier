@@ -39,7 +39,6 @@ function ProofModal({
   onOpenChange,
   ballotId,
 }: ProofModalProps): JSX.Element {
-  console.log(proof);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {!proof ? null : (
