@@ -5,16 +5,19 @@ import cryptoJs from "crypto-js";
 
 const { SHA256 } = cryptoJs;
 
-function constructParentNode([left, right]: [TreeNode, TreeNode]): [
-  string,
-  Prisma.MerkleNodeCreateManyInput
-] {
-  const parentHash = SHA256(left.value + right.value).toString();
+function constructParentNode(
+  [left, right]: [TreeNode, TreeNode],
+  layer: number
+): [string, Prisma.RadixNodeCreateManyInput] {
+  const id = left.id.slice(0, layer);
+  const parentHash = SHA256(
+    left.value + right.value + left.id + right.id
+  ).toString();
 
   return [
     parentHash,
     {
-      id: left.id.slice(0, left.id.length - 1),
+      id,
       value: parentHash,
       leftId: left.isBallot ? undefined : left.id,
       leftBallotId: left.isBallot ? left.id : undefined,
@@ -25,6 +28,8 @@ function constructParentNode([left, right]: [TreeNode, TreeNode]): [
 }
 
 export async function action() {
+  await db.radixNode.deleteMany();
+
   const ballots = await db.ballot.findMany({
     orderBy: {
       id: "asc",
@@ -42,7 +47,6 @@ export async function action() {
   }));
 
   for (let layer = ballots[0].id.length - 1; layer >= 0; layer--) {
-    console.log(nodes);
     const parentNodes: Record<string, TreeNode[]> = {};
 
     console.log(`Layer ${layer}`);
@@ -58,16 +62,16 @@ export async function action() {
     });
 
     nodes = [];
-    const createOperations: Prisma.MerkleNodeCreateManyInput[] = [];
+    const createOperations: Prisma.RadixNodeCreateManyInput[] = [];
 
     for (const [parentId, children] of Object.entries(parentNodes)) {
       if (children.length === 2) {
         const [left, right] = children;
 
-        const [parentHash, createOperation] = constructParentNode([
-          left,
-          right,
-        ]);
+        const [parentHash, createOperation] = constructParentNode(
+          [left, right],
+          layer
+        );
 
         createOperations.push(createOperation);
 
@@ -76,36 +80,15 @@ export async function action() {
           value: parentHash,
         });
       } else {
-        const isRightMissing = children[0].id.endsWith("0");
-
-        const frontierNode: TreeNode = {
-          id: parentId + (isRightMissing ? "1" : "0"),
-          value: "0",
-        };
-
-        createOperations.push({
-          id: frontierNode.id,
-          value: frontierNode.value,
-        });
-
-        const newChildren: [TreeNode, TreeNode] = isRightMissing
-          ? [children[0], frontierNode]
-          : [frontierNode, children[0]];
-
-        const [parentHash, createOperation] = constructParentNode(newChildren);
-
-        createOperations.push(createOperation);
-
-        nodes.push({
-          id: parentId,
-          value: parentHash,
-        });
+        nodes.push(children[0]);
       }
     }
 
     nodes = nodes.sort((a, b) => a.id.localeCompare(b.id));
 
-    await db.merkleNode.createMany({
+    console.log(createOperations);
+
+    await db.radixNode.createMany({
       data: createOperations,
     });
   }

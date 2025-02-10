@@ -1,12 +1,11 @@
 import { db } from "@/db.server";
-import { MerkleProof, MerkleProofStep } from "@/lib/types";
+import { RadixProof, RadixProofStep } from "@/lib/types";
+import { getCommonPrefix } from "@/lib/utils";
 import { ActionFunctionArgs, json } from "@remix-run/node";
 
 type ActionData = {
-  proof: MerkleProof;
+  proof: RadixProof;
 };
-
-export type GenerateProofActionData = ActionData;
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -28,48 +27,18 @@ export async function action({ request }: ActionFunctionArgs) {
   const included = !!ballot;
 
   let targetId: string = ballotId;
+  let targetValue: string = ballotId;
 
   const prefixes = Array.from({ length: targetId.length }, (_, i) =>
     targetId.slice(0, targetId.length - i - 1)
   );
 
-  if (!included) {
-    const nodesWithPrefix = await db.merkleNode
-      .findMany({
-        where: {
-          OR: [
-            {
-              id: {
-                in: prefixes,
-              },
-            },
-            {
-              id: targetId,
-              value: "0",
-            },
-          ],
-        },
-      })
-      .then((nodes) => nodes.sort((a, b) => b.id.length - a.id.length));
-
-    targetId = nodesWithPrefix[0].id;
-  }
-
-  const parentNodes = await db.merkleNode
+  const nodesWithPrefix = await db.radixNode
     .findMany({
       where: {
-        AND: [
-          {
-            id: {
-              in: prefixes,
-            },
-          },
-          {
-            id: {
-              not: targetId,
-            },
-          },
-        ],
+        id: {
+          in: prefixes,
+        },
       },
       include: {
         left: true,
@@ -80,10 +49,33 @@ export async function action({ request }: ActionFunctionArgs) {
     })
     .then((nodes) => nodes.sort((a, b) => b.id.length - a.id.length));
 
-  let proofSteps: MerkleProofStep[] = [];
+  if (!included) {
+    const longestPrefixNode = nodesWithPrefix[0];
+
+    const left = longestPrefixNode.left ?? longestPrefixNode.leftBallot;
+    const right = longestPrefixNode.right ?? longestPrefixNode.rightBallot;
+
+    if (!left || !right) {
+      throw new Error("Could not find left or right child");
+    }
+
+    const leftIsNextChild =
+      getCommonPrefix(ballotId, left.id).length >
+      getCommonPrefix(ballotId, right.id).length;
+
+    const nextChild = leftIsNextChild ? left : right;
+
+    targetId = nextChild.id;
+    targetValue =
+      "value" in nextChild && typeof nextChild.value === "string"
+        ? nextChild.value
+        : nextChild.id;
+  }
+
+  let proofSteps: RadixProofStep[] = [];
   let prevId = targetId;
 
-  for (const node of parentNodes) {
+  for (const node of nodesWithPrefix) {
     const left = node.left ?? node.leftBallot;
     const right = node.right ?? node.rightBallot;
 
@@ -91,16 +83,17 @@ export async function action({ request }: ActionFunctionArgs) {
     const sibling = siblingIsRight ? right : left;
 
     if (!sibling) {
-      throw new Error("Invalid tree structure");
+      throw new Error("Could not find next sibling in path");
     }
 
     proofSteps.push({
+      id: (siblingIsRight ? left?.id : right?.id) as string,
+      siblingPosition: siblingIsRight ? "right" : "left",
+      siblingId: sibling.id,
       siblingValue:
         "value" in sibling && typeof sibling.value === "string"
           ? sibling.value
           : sibling.id,
-      siblingId: sibling.id,
-      siblingPosition: siblingIsRight ? "right" : "left",
     });
 
     prevId = node.id;
@@ -109,6 +102,7 @@ export async function action({ request }: ActionFunctionArgs) {
   return json<ActionData>({
     proof: {
       included,
+      targetValue,
       targetId,
       proofSteps,
     },

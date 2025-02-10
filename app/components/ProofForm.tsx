@@ -1,5 +1,9 @@
-import { useEffect, useState } from "react";
+import { toast } from "@/hooks/use-toast";
+import { MerkleProof, RadixProof, Tree } from "@/lib/types";
 import { useFetcher } from "@remix-run/react";
+import { CopyIcon, DicesIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import MerkleProofModal from "./MerkleTree/MerkleProofModal";
 import { Button } from "./ui/button";
 import {
   Card,
@@ -8,13 +12,10 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { Label } from "./ui/label";
 import { Input } from "./ui/input";
-import { CopyIcon, Dice1Icon, DicesIcon } from "lucide-react";
+import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
-import ProofModal from "./ProofModal";
-import { toast } from "@/hooks/use-toast";
-import { Proof, Tree } from "@/lib/types";
+import RadixProofModal from "./RadixTree/RadixProofModal";
 
 type GenerateProofFormProps = {
   root: string;
@@ -28,7 +29,7 @@ function GenerateProofForm({
   treeType,
 }: GenerateProofFormProps): JSX.Element {
   const [ballotId, dangerouslySetBallotId] = useState("");
-  const [proof, setProof] = useState<Proof | null>(null);
+  const [proof, setProof] = useState<MerkleProof | RadixProof | null>(null);
   const [proofModalOpen, setProofModalOpen] = useState(false);
 
   const getRandomBallotFetcher = useFetcher();
@@ -104,19 +105,6 @@ function GenerateProofForm({
       });
   }
 
-  useEffect(() => {
-    if (
-      getRandomBallotFetcher.state !== "idle" ||
-      !getRandomBallotFetcher.data ||
-      typeof getRandomBallotFetcher.data !== "object" ||
-      !("ballotId" in getRandomBallotFetcher.data) ||
-      typeof getRandomBallotFetcher.data?.ballotId !== "string"
-    )
-      return;
-
-    setBallotId(getRandomBallotFetcher.data?.ballotId);
-  }, [getRandomBallotFetcher.state]);
-
   function handleCopyRoot() {
     navigator.clipboard.writeText(root);
 
@@ -179,13 +167,30 @@ function GenerateProofForm({
           )}
         </CardContent>
       </Card>
-      <ProofModal
-        proof={proof}
-        open={proofModalOpen && proof !== null}
-        onOpenChange={setProofModalOpen}
-        rootHash={root}
-        treeType={treeType}
-      />
+      {(() => {
+        switch (treeType) {
+          case "merkle":
+            return (
+              <MerkleProofModal
+                proof={proof as MerkleProof | null}
+                open={proofModalOpen && proof !== null}
+                onOpenChange={setProofModalOpen}
+                rootHash={root}
+                ballotId={ballotId}
+              />
+            );
+          case "radix":
+            return (
+              <RadixProofModal
+                proof={proof as RadixProof | null}
+                open={proofModalOpen && proof !== null}
+                onOpenChange={setProofModalOpen}
+                rootHash={root}
+                ballotId={ballotId}
+              />
+            );
+        }
+      })()}
     </>
   );
 }

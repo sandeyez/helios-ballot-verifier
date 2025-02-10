@@ -10,26 +10,26 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "./ui/accordion";
-import { Badge } from "./ui/badge";
+} from "../ui/accordion";
+import { Badge } from "../ui/badge";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "./ui/dialog";
-import { Label } from "./ui/label";
-import { ScrollArea } from "./ui/scroll-area";
-import VerifyProofButton from "./VerifyProofButton";
-import { Proof, Tree } from "@/lib/types";
+} from "../ui/dialog";
+import { Label } from "../ui/label";
+import { ScrollArea } from "../ui/scroll-area";
+import { RadixProof, Tree } from "@/lib/types";
+import { VerifyRadixProofButton } from "./VerifyRadixProofButton";
 
 type ProofModalProps = {
-  proof: Proof | null;
+  proof: RadixProof | null;
   rootHash: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  treeType: Tree;
+  ballotId: string;
 };
 
 function ProofModal({
@@ -37,7 +37,9 @@ function ProofModal({
   open,
   rootHash,
   onOpenChange,
+  ballotId,
 }: ProofModalProps): JSX.Element {
+  console.log(proof);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {!proof ? null : (
@@ -68,11 +70,15 @@ function ProofModal({
               </span>
               <div className="text-white"></div>
             </Badge>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium leading-none whitespace-nowrap ">
+            <div className="grid grid-cols-[auto_1fr] gap-2 content-center">
+              <span className="text-sm font-medium leading-none whitespace-nowrap block w-fit">
                 Target ID
               </span>
               <pre className="truncate text-sm">{proof.targetId}</pre>
+              <span className="text-sm font-medium leading-none whitespace-nowrap block w-fit">
+                Target Value
+              </span>
+              <pre className="text-sm break-all">{proof.targetValue}</pre>
             </div>
           </div>
           <div>
@@ -80,17 +86,13 @@ function ProofModal({
             <ScrollArea className="h-72 w-full rounded-md border">
               <Accordion type="single" collapsible className="w-full">
                 {proof.proofSteps.map(
-                  ({ siblingId, siblingPosition, siblingValue }, index) => (
+                  ({ siblingId, siblingPosition, siblingValue, id }, index) => (
                     <>
-                      <AccordionItem
-                        value={siblingId}
-                        className="px-2"
-                        key={siblingId}
-                      >
+                      <AccordionItem value={id} className="px-2" key={id}>
                         <AccordionTrigger>
                           <div className="flex items-center gap-2">
                             <span>{index + 1}.</span>
-                            <pre className="truncate ">{siblingId}</pre>
+                            <pre className="truncate ">{id}</pre>
                           </div>
                         </AccordionTrigger>
                         <AccordionContent className="flex wrap gap-y-2 gap-x-4 justify-between">
@@ -121,7 +123,11 @@ function ProofModal({
               </Accordion>
             </ScrollArea>
             <div className="w-full mt-4">
-              <VerifyProofButton proof={proof} rootHash={rootHash} />
+              <VerifyRadixProofButton
+                proof={proof}
+                rootHash={rootHash}
+                ballotId={ballotId}
+              />
             </div>
           </div>
         </DialogContent>

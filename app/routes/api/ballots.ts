@@ -54,7 +54,7 @@ export async function action({ request }: ActionFunctionArgs) {
     }
     case "DELETE": {
       // Delete all the existing tree nodes.
-      await Promise.all([
+      await db.$transaction([
         db.ballot.deleteMany(),
         db.merkleNode.deleteMany(),
         db.radixNode.deleteMany(),

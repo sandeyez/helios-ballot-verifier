@@ -8,14 +8,30 @@ export type TreeNode = {
   right?: TreeNode | null | undefined;
 };
 
-export type ProofStep = {
+export type MerkleProofStep = {
   siblingPosition: "left" | "right";
   siblingId: string;
   siblingValue: string;
 };
 
-export type Proof = {
-  proofSteps: ProofStep[];
+export type MerkleProof = {
   included: boolean;
+  proofSteps: MerkleProofStep[];
   targetId: string;
 };
+
+export type RadixProofStep = {
+  id: string;
+  siblingPosition: "left" | "right";
+  siblingId: string;
+  siblingValue: string;
+};
+
+export type RadixProof = {
+  included: boolean;
+  proofSteps: RadixProofStep[];
+  targetId: string;
+  targetValue: string;
+};
+
+export type ProofVerificactionState = "pending" | "verified" | "failed";
