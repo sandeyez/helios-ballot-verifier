@@ -86,8 +86,6 @@ export async function action() {
 
     nodes = nodes.sort((a, b) => a.id.localeCompare(b.id));
 
-    console.log(createOperations);
-
     await db.radixNode.createMany({
       data: createOperations,
     });

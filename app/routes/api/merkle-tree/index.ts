@@ -42,7 +42,6 @@ export async function action() {
   }));
 
   for (let layer = ballots[0].id.length - 1; layer >= 0; layer--) {
-    console.log(nodes);
     const parentNodes: Record<string, TreeNode[]> = {};
 
     console.log(`Layer ${layer}`);
