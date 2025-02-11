@@ -1,7 +1,6 @@
 import { Link } from "@remix-run/react";
-import { useEffect, useState } from "react";
-import { Button } from "./ui/button";
 import { HomeIcon } from "lucide-react";
+import { Button } from "./ui/button";
 
 type NoTreeFoundProps = {};
 

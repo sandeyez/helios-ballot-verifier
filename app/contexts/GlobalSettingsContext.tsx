@@ -1,7 +1,6 @@
 import { createContext, ReactNode, useContext, useState } from "react";
 
 type GlobalSettingsContextValue = {
-  setBallotLength: (value: number) => void;
   ballotLength: number;
 };
 
@@ -13,17 +12,21 @@ export const useGlobalSettings = () => useContext(GlobalSettingsContext);
 
 type GlobalSettingsContextProviderProps = {
   children: ReactNode;
-  initialBallotLength: number;
+  ballotLength: number;
 };
 
+/**
+ * Context that provides the ballot length throughout the application.
+ *
+ * @param ballotLength The length of the ballot ID.
+ * @param children The children components that will have access to the context.
+ */
 function GlobalSettingsContextProvider({
   children,
-  initialBallotLength,
+  ballotLength,
 }: GlobalSettingsContextProviderProps): JSX.Element {
-  const [ballotLength, setBallotLength] = useState<number>(initialBallotLength);
-
   return (
-    <GlobalSettingsContext.Provider value={{ ballotLength, setBallotLength }}>
+    <GlobalSettingsContext.Provider value={{ ballotLength }}>
       {children}
     </GlobalSettingsContext.Provider>
   );

@@ -1,5 +1,6 @@
 export type Tree = "merkle" | "radix";
 
+// Type that stores a tree-agnostic node.
 export type TreeNode = {
   id: string;
   value: string;
@@ -8,6 +9,9 @@ export type TreeNode = {
   right?: TreeNode | null | undefined;
 };
 
+// |--------------------|
+// | Merkle Proof types |
+// |--------------------|
 export type MerkleProofStep = {
   siblingPosition: "left" | "right";
   siblingId: string;
@@ -20,6 +24,9 @@ export type MerkleProof = {
   targetId: string;
 };
 
+// |-------------------|
+// | Radix Proof types |
+// |-------------------|
 export type RadixProofStep = {
   id: string;
   siblingPosition: "left" | "right";

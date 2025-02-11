@@ -1,12 +1,18 @@
 import { ProofVerificactionState } from "@/lib/types";
-import { useEffect, useState } from "react";
-import { Button } from "./ui/button";
 import { ShieldCheckIcon, ShieldXIcon } from "lucide-react";
+import { useState } from "react";
+import { Button } from "./ui/button";
 
 type VerifyProofButtonProps = {
   handleVerifyProof: () => ProofVerificactionState;
 };
 
+/**
+ * Wrapper of the Button-component that changes color based on the verification state.
+ *
+ * @param handleVerifyProof The function to call when the button is clicked. This function should return
+ * the next verification state.
+ */
 export function VerifyProofButton({
   handleVerifyProof,
 }: VerifyProofButtonProps) {

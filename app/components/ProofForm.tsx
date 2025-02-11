@@ -23,6 +23,15 @@ type GenerateProofFormProps = {
   treeType: Tree;
 };
 
+/**
+ * Generic form component that is used to generate a proof for a ballot, for any tree type.
+ * It also displays the root hash.
+ * When the proof is generated, a model is tree-specific modal is shown to display the proof.
+ *
+ * @param root The root hash of the tree.
+ * @param ballotLength The length of the ballot ID.
+ * @param treeType The type of tree to generate the proof for, used to determine the endpoint to call.
+ */
 function GenerateProofForm({
   root,
   ballotLength,

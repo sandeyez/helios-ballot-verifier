@@ -27,17 +27,27 @@ import { VerifyMerkleProofButton } from "./VerifyMerkleProofButton";
 type ProofModalProps = {
   proof: MerkleProof | null;
   rootHash: string;
+  ballotId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  ballotId: string;
 };
 
+/**
+ * Modal implementation for Merkle proofs. It allows the user to view the contents of the proof,
+ * and features the ability to verify the proof against a given root hash.
+ *
+ * @param proof The Merkle proof to display.
+ * @param rootHash The root hash to verify the proof against.
+ * @param ballotId The ID of the ballot to verify the proof against.
+ * @param open Whether the modal is open or not.
+ * @param onOpenChange Callback to change the open state of the modal.
+ */
 function ProofModal({
   proof,
-  open,
   rootHash,
-  onOpenChange,
   ballotId,
+  open,
+  onOpenChange,
 }: ProofModalProps): JSX.Element {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

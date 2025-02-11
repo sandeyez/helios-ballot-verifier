@@ -7,6 +7,11 @@ type BallotTrackerInputProps = {
   onChange: (value: string) => void;
 };
 
+/**
+ * Wrapper of the Input component that only allows the user to input 0s and 1s, and a maximum of `ballotLength` characters.
+ * @param value The current value of the input.
+ * @param onChange The function to call when the input value changes.
+ */
 function BallotTrackerInput({
   value,
   onChange,

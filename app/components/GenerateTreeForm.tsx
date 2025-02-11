@@ -10,6 +10,11 @@ type GenerateTreeFormProps = {
   treeType: Tree;
 };
 
+/**
+ * Form that is used to generate a tree.
+ *
+ * @param treeType The type of tree to generate, used to determine the endpoint to call.
+ */
 export function GenerateTreeForm({
   treeType,
 }: GenerateTreeFormProps): JSX.Element {

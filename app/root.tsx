@@ -62,7 +62,7 @@ export default function App() {
         <Links />
       </head>
       <body className="gap-4 max-w-[100dvw] h-screen w-screen max-h-svh overflow-auto flex flex-col">
-        <GlobalSettingsContextProvider initialBallotLength={ballotLength}>
+        <GlobalSettingsContextProvider ballotLength={ballotLength}>
           <nav className="flex items-center py-2 px-8">
             <Link className="text-lg font-bold mr-8" to={"/"}>
               Helios Ballot Verifier
