@@ -14,6 +14,7 @@ In order to get the code to run, the following prerequisites must be fulfilled:
 - The Docker container with the PostreSQL database must be running. It can be started using ```docker compose up -d``` and stopped with ```docker compose down```. [[Docs](https://docs.docker.com/compose/)]
 - NodeJS and NPM (Node Package Manager) must be installed on your system. [[Instructions](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)].
 - The dependencies of the project must be installed, using ```npm install```. [[Instructions](https://docs.npmjs.com/cli/v8/commands/npm-install)]
+- Create a ```.env``` file and paste the contents from ```.env.example``` inside it. This file is used to set the environment variables for the project.
 - Finally, the project can be started using ```npm run dev```.
 
 ### Contents
